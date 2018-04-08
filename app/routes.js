@@ -9,6 +9,7 @@ module.exports = function(app, passport) {
 
     // PROFILE SECTION =========================
     app.get('/profile', isLoggedIn, function(req, res) {
+        console.log('/profile req.user: ', req.user);
         res.render('profile.ejs', {
             user : req.user
         });
@@ -54,14 +55,16 @@ module.exports = function(app, passport) {
     // facebook -------------------------------
 
         // send to facebook to do the authentication
-        app.get('/auth/facebook', passport.authenticate('facebook', { scope : ['public_profile', 'email'] }));
+        app.get('/auth/facebook', passport.authenticate('facebook', {
+          scope : ['public_profile', 'email']
+        }));
 
         // handle the callback after facebook has authenticated the user
         app.get('/auth/facebook/callback',
-            passport.authenticate('facebook', {
-                successRedirect : '/profile',
-                failureRedirect : '/'
-            }));
+        passport.authenticate('facebook', {
+            successRedirect : '/profile',
+            failureRedirect : '/'
+        }));
 
     // twitter --------------------------------
 

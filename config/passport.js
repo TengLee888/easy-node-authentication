@@ -20,12 +20,16 @@ module.exports = function(passport) {
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
+      console.log('serializeUser, user: ', user);
         done(null, user.id);
     });
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
+      console.log('deserializeUser, id: ', id);
         User.findById(id, function(err, user) {
+          console.log('deserializeUser, findById, id: ', id);
+          console.log('deserializeUser, findById, user: ', user);
             done(err, user);
         });
     });
@@ -40,12 +44,18 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     },
     function(req, email, password, done) {
+      console.log("login req: ", req);
+      console.log("login email, password: ");
+      console.log(email, password);
         if (email)
             email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
         // asynchronous
         process.nextTick(function() {
             User.findOne({ 'local.email' :  email }, function(err, user) {
+                console.log('User.findOne err: ', err);
+                console.log('User.findOne user: ', user);
+
                 // if there are any errors, return the error
                 if (err)
                     return done(err);
@@ -75,6 +85,9 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     },
     function(req, email, password, done) {
+      console.log("signup req: ", req);
+      console.log("signup email, password: ");
+      console.log(email, password);
         if (email)
             email = email.toLowerCase(); // Use lower-case e-mails to avoid case-sensitive e-mail matching
 
@@ -114,7 +127,7 @@ module.exports = function(passport) {
                 User.findOne({ 'local.email' :  email }, function(err, user) {
                     if (err)
                         return done(err);
-                    
+
                     if (user) {
                         return done(null, false, req.flash('loginMessage', 'That email is already taken.'));
                         // Using 'loginMessage instead of signupMessage because it's used by /connect/local'
@@ -125,7 +138,7 @@ module.exports = function(passport) {
                         user.save(function (err) {
                             if (err)
                                 return done(err);
-                            
+
                             return done(null,user);
                         });
                     }
@@ -145,48 +158,47 @@ module.exports = function(passport) {
     var fbStrategy = configAuth.facebookAuth;
     fbStrategy.passReqToCallback = true;  // allows us to pass in the req from our route (lets us check if a user is logged in or not)
     passport.use(new FacebookStrategy(fbStrategy,
+    // facebook will send back the token and profile
     function(req, token, refreshToken, profile, done) {
-
         // asynchronous
         process.nextTick(function() {
-
+          console.log('passport req.user: ', req.user);
+          console.log('passport profile ', profile);
             // check if the user is already logged in
             if (!req.user) {
 
                 User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
+                  console.log('passport, User.findOne, err: ', err);
+                  console.log('passport, User.findOne, user: ', user);
                     if (err)
                         return done(err);
-
+                    // if the user is found, then log them in
                     if (user) {
-
                         // if there is a user id already but no token (user was linked at one point and then removed)
                         if (!user.facebook.token) {
                             user.facebook.token = token;
                             user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
                             user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
+                            console.log('資料庫的user.facebook.token失效，重新存入user資料 存入user資料 user.save, user : ', user);
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
                                 return done(null, user);
                             });
                         }
-
                         return done(null, user); // user found, return that user
                     } else {
                         // if there is no user, create them
                         var newUser            = new User();
-
                         newUser.facebook.id    = profile.id;
                         newUser.facebook.token = token;
                         newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
                         newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
+                        console.log('資料庫沒有user資料，存入newUser資料 newUser.save, newUser : ', newUser);
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -195,16 +207,15 @@ module.exports = function(passport) {
             } else {
                 // user already exists and is logged in, we have to link accounts
                 var user            = req.user; // pull the user out of the session
-
                 user.facebook.id    = profile.id;
                 user.facebook.token = token;
                 user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
                 user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
+                // console.log('else user.facebook: ', user.facebook);
+                console.log('資料庫有user資料，重新存入user資料 user.save, user : ', user);
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
                     return done(null, user);
                 });
 
@@ -246,7 +257,7 @@ module.exports = function(passport) {
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
+
                                 return done(null, user);
                             });
                         }
@@ -264,7 +275,7 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -282,7 +293,7 @@ module.exports = function(passport) {
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
+
                     return done(null, user);
                 });
             }
@@ -325,7 +336,7 @@ module.exports = function(passport) {
                             user.save(function(err) {
                                 if (err)
                                     return done(err);
-                                    
+
                                 return done(null, user);
                             });
                         }
@@ -342,7 +353,7 @@ module.exports = function(passport) {
                         newUser.save(function(err) {
                             if (err)
                                 return done(err);
-                                
+
                             return done(null, newUser);
                         });
                     }
@@ -360,7 +371,7 @@ module.exports = function(passport) {
                 user.save(function(err) {
                     if (err)
                         return done(err);
-                        
+
                     return done(null, user);
                 });
 

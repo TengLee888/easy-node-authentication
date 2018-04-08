@@ -4,10 +4,10 @@
 module.exports = {
 
     'facebookAuth' : {
-        'clientID'        : 'your-secret-clientID-here', // your App ID
-        'clientSecret'    : 'your-client-secret-here', // your App Secret
+        'clientID'        : '325592951180673', // your App ID
+        'clientSecret'    : '1aefab6450d3a2584df55e1bfc86d0a6', // your App Secret
         'callbackURL'     : 'http://localhost:8080/auth/facebook/callback',
-        'profileURL': 'https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email',
+        'profileURL'      : 'https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email',
         'profileFields'   : ['id', 'email', 'name'] // For requesting permissions from Facebook API
 
     },

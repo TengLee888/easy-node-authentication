@@ -1,6 +1,7 @@
 // config/database.js
 module.exports = {
-
-    'url' : 'mongodb://localhost/passport' // looks like mongodb://<user>:<pass>@mongo.onmodulus.net:27017/Mikha4ot
-
+  // url:'mongodb://heroku_xj85pq2p:Harvest888!!!@ds113282.mlab.com:13282/heroku_xj85pq2p'
+  // url:'mongodb://heroku_xj85pq2p:Iamrich888!!!@ds113282.mlab.com:13282/heroku_xj85pq2p'
+  // url:'mongodb://tenglee_is_rich:Harvest888!!!@ds113282.mlab.com:13282/heroku_xj85pq2p'
+  url:'mongodb://tenglee:Harvest888!!!@ds113282.mlab.com:13282/heroku_xj85pq2p'
 };
